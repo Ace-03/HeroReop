@@ -6,16 +6,21 @@ public class PlayerBehaviour : MonoBehaviour
 {
     public float moveSpeed = 10f;
     public float rotateSpeed = 75f;
-
+    public float jumpVelociy = 5f;
+    public float distanceToGround = 0.1f;
+    public LayerMask groundLayer;
+    
     private float vInput;
     private float hInput;
-
     private Rigidbody _rb;
+    private CapsuleCollider _col;
 
     // Start is called before the first frame update
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
+
+        _col = GetComponent<CapsuleCollider>();
     }
 
 
@@ -34,7 +39,19 @@ public class PlayerBehaviour : MonoBehaviour
 
     void FixedUpdate()
     {
-       
+
+        if(IsGrounded() && Input.GetKeyDown(KeyCode.Space))
+        {
+            _rb.AddForce(Vector3.up * jumpVelociy, ForceMode.Impulse);
+        }
+
+        
+
+        if (Input.GetKeyDown(KeyCode.Space)) 
+        {
+            _rb.AddForce(Vector3.up * jumpVelociy, ForceMode.Impulse);
+        }
+
         Vector3 rotation = Vector3.up * hInput;
         Quaternion angleRot = Quaternion.Euler(rotation * Time.fixedDeltaTime);
 
@@ -43,4 +60,13 @@ public class PlayerBehaviour : MonoBehaviour
     
     }
 
+    private bool IsGrounded()
+    {
+
+        Vector3 capsuleBottom = new Vector3(_col.bounds.center.x, _col.bounds.min.y, _col.bounds.center.z);
+
+        bool grounded = Physics.CheckCapsule(_col.bounds.center, capsuleBottom, distanceToGround, groundLayer, QueryTriggerInteraction.Ignore);
+
+        return grounded;
+    }
 }
