@@ -49,13 +49,6 @@ public class PlayerBehaviour : MonoBehaviour
             _rb.AddForce(Vector3.up * jumpVelociy, ForceMode.Impulse);
         }
 
-        
-
-        if (Input.GetKeyDown(KeyCode.Space)) 
-        {
-            _rb.AddForce(Vector3.up * jumpVelociy, ForceMode.Impulse);
-        }
-
         Vector3 rotation = Vector3.up * hInput;
         Quaternion angleRot = Quaternion.Euler(rotation * Time.fixedDeltaTime);
 
