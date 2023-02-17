@@ -257,7 +257,7 @@ MonoBehaviour:
   distanceToGround: 0.1
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   bullet: {fileID: 6063971760799361149, guid: 31db1042e6a974342b770e0145eddf91, type: 3}
   bulletSpeed: 10
 --- !u!1 &40317421

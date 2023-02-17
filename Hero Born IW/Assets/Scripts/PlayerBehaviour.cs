@@ -35,6 +35,20 @@ public class PlayerBehaviour : MonoBehaviour
 
         vInput = Input.GetAxis("Vertical") * moveSpeed;
         hInput = Input.GetAxis("Horizontal") * rotateSpeed;
+
+        if (IsGrounded() && Input.GetKeyDown(KeyCode.Space))
+        {
+            _rb.AddForce(Vector3.up * jumpVelociy, ForceMode.Impulse);
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+
+            GameObject newBullet = Instantiate(bullet, this.transform.position + new Vector3(1, 0, 0), this.transform.rotation) as GameObject;
+            Rigidbody bulletRB = newBullet.GetComponent<Rigidbody>();
+
+            bulletRB.velocity = this.transform.forward * bulletSpeed;
+        }
         /*
         this.transform.Translate(Vector3.forward * vInput * Time.deltaTime);
         this.transform.Rotate(Vector3.up * hInput * Time.deltaTime);
@@ -43,26 +57,11 @@ public class PlayerBehaviour : MonoBehaviour
 
     void FixedUpdate()
     {
-
-        if(IsGrounded() && Input.GetKeyDown(KeyCode.Space))
-        {
-            _rb.AddForce(Vector3.up * jumpVelociy, ForceMode.Impulse);
-        }
-
         Vector3 rotation = Vector3.up * hInput;
         Quaternion angleRot = Quaternion.Euler(rotation * Time.fixedDeltaTime);
 
         _rb.MovePosition(this.transform.position + this.transform.forward * vInput * Time.fixedDeltaTime);
         _rb.MoveRotation(_rb.rotation * angleRot);
-
-        if (Input.GetMouseButtonDown(0)) 
-        {
-
-            GameObject newBullet = Instantiate(bullet, this.transform.position + new Vector3(1, 0, 0), this.transform.rotation) as GameObject;
-            Rigidbody bulletRB = newBullet.GetComponent<Rigidbody>();
-
-            bulletRB.velocity = this.transform.forward * bulletSpeed;
-        }
     }
 
     private bool IsGrounded()
