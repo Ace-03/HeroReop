@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+
+
     public float moveSpeed = 10f;
     public float rotateSpeed = 75f;
     public float jumpVelociy = 5f;
@@ -18,6 +20,9 @@ public class PlayerBehaviour : MonoBehaviour
     private Rigidbody _rb;
     private CapsuleCollider _col;
     private GameBehavior _gameManager;
+
+    public delegate void JumpingEvent();
+    public event JumpingEvent playerJump;
 
     // Start is called before the first frame update
     void Start()
@@ -39,6 +44,7 @@ public class PlayerBehaviour : MonoBehaviour
         if (IsGrounded() && Input.GetKeyDown(KeyCode.Space))
         {
             _rb.AddForce(Vector3.up * jumpVelociy, ForceMode.Impulse);
+            playerJump();
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -66,11 +72,8 @@ public class PlayerBehaviour : MonoBehaviour
 
     private bool IsGrounded()
     {
-
         Vector3 capsuleBottom = new Vector3(_col.bounds.center.x, _col.bounds.min.y, _col.bounds.center.z);
-
         bool grounded = Physics.CheckCapsule(_col.bounds.center, capsuleBottom, distanceToGround, groundLayer, QueryTriggerInteraction.Ignore);
-
         return grounded;
     }
 

@@ -6,12 +6,16 @@ using CustomExtension;
 
 public class GameBehavior : MonoBehaviour, IManager
 {
+
+    public delegate void DebugDelegate(string newText);
+    public DebugDelegate debug = Print;
     private int _itemsCollected = 0;
     
     public bool showWinScreen = false;
     public string labelText = "Collect all 4 items and win your freedom";
     public int maxItems = 4;
     public bool showLossScreen = false;
+    public Stack<string> lootStack = new Stack<string>();
 
     private string _state;
     public string State
@@ -23,7 +27,9 @@ public class GameBehavior : MonoBehaviour, IManager
     { 
     
         get { return _itemsCollected; }
-        set { _itemsCollected = value;
+        set 
+        { 
+                _itemsCollected = value;
                 Debug.LogFormat("Items: {0}", _itemsCollected);
 
                     if (_itemsCollected >= maxItems)
@@ -68,6 +74,33 @@ public class GameBehavior : MonoBehaviour, IManager
         _state = "Manager initialize..";
         _state.FancyDebug();
         Debug.Log(_state);
+
+        lootStack.Push("Sword of Doom");
+        lootStack.Push("HP+");
+        lootStack.Push("Golden Ring");
+        lootStack.Push("Winged Boot");
+        lootStack.Push("Mythril Bracers");
+        debug(_state);
+        LogWithDelegate(debug);
+
+        GameObject player = GameObject.Find("Player");
+        PlayerBehaviour playerBehaviour = player.GetComponent<PlayerBehaviour>();
+        playerBehaviour.playerJump += HandlePlayerJump;
+    }
+
+    public void HandlePlayerJump()
+    {
+        debug("Player has jumped...");
+    }
+
+    public static void Print(string newText)
+    {
+        Debug.Log(newText);
+    }
+
+    public void LogWithDelegate(DebugDelegate del)
+    {
+        del("Delegating the debug task...");
     }
     
     void OnGUI()
@@ -89,7 +122,20 @@ public class GameBehavior : MonoBehaviour, IManager
         {
             if (GUI.Button(new Rect(Screen.width / 2 - 100, Screen.height / 2 - 50, 200, 100), "YOU LOSE..."))
             {
-                Utilities.RestartLevel();
+                try
+                {
+                    Utilities.RestartLevel(-1);
+                    debug("Level restarted successfully...");
+                }
+                catch (System.ArgumentException e)
+                {
+                    Utilities.RestartLevel(0);
+                    debug("Reverting to scene 0: " + e.ToString());
+                }
+                finally
+                {
+                    debug("Restart handled...");
+                }
             }
         }
     }
@@ -100,12 +146,23 @@ public class GameBehavior : MonoBehaviour, IManager
     void Start()
     {
         Initialize();
+        InventoryList<string> inventoryList = new InventoryList<string>();
+        inventoryList.SetItem("Potion");
+        Debug.Log(inventoryList.item);
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void PrintLootReport()
+    {
+        var currentItem = lootStack.Pop();
+        var nextItem = lootStack.Peek();
+        Debug.LogFormat("You got a {0}! You've got a good chance of finding a {1} next!", currentItem, nextItem);
+        Debug.LogFormat("There are {0} random loot items waiting for you!", lootStack.Count);
     }
 }
 
